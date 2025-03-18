@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 300px;
+            background: white;
+            padding: 20px;
+            margin: 50px auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        .input-section {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        input {
+            width: 75%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 8px 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        li {
+            background: #eee;
+            margin: 5px 0;
+            padding: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 4px;
+        }
+
+        li.completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+
+        .delete-btn {
+            background: red;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .delete-btn:hover {
+            background: darkred;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>To-Do List ✅</h2>
+        <div class="input-section">
+            <input type="text" id="taskInput" placeholder="Add a new task...">
+            <button onclick="addTask()">Add</button>
+        </div>
+        <ul id="taskList"></ul>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", loadTasks);
+
+        function addTask() {
+            let taskInput = document.getElementById("taskInput");
+            let taskText = taskInput.value.trim();
+            
+            if (taskText === "") {
+                alert("Please enter a task!");
+                return;
+            }
+
+            let taskList = document.getElementById("taskList");
+
+            let li = document.createElement("li");
+            li.innerHTML = `${taskText} <button class="delete-btn" onclick="removeTask(this)">X</button>`;
+            
+            li.addEventListener("click", function() {
+                li.classList.toggle("completed");
+                saveTasks();
+            });
+
+            taskList.appendChild(li);
+            taskInput.value = "";
+            
+            saveTasks();
+        }
+
+        function removeTask(button) {
+            let li = button.parentElement;
+            li.remove();
+            saveTasks();
+        }
+
+        function saveTasks() {
+            let tasks = [];
+            document.querySelectorAll("#taskList li").forEach(li => {
+                tasks.push({ text: li.textContent.replace("X", "").trim(), completed: li.classList.contains("completed") });
+            });
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+        }
+
+        function loadTasks() {
+            let savedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+            let taskList = document.getElementById("taskList");
+
+            savedTasks.forEach(task => {
+                let li = document.createElement("li");
+                li.innerHTML = `${task.text} <button class="delete-btn" onclick="removeTask(this)">X</button>`;
+                if (task.completed) li.classList.add("completed");
+
+                li.addEventListener("click", function() {
+                    li.classList.toggle("completed");
+                    saveTasks();
+                });
+
+                taskList.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
